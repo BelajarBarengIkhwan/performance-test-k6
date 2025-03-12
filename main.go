@@ -42,5 +42,31 @@ func main() {
 		}
 		return c.SendStatus(http.StatusNoContent)
 	})
+	server.Post("/uncommon", func(c *fiber.Ctx) error {
+		if c.Get("Content-Type") != "application/json" {
+			return c.JSON(fiber.Map{
+				"status_code": http.StatusBadRequest,
+			})
+		}
+
+		success := choices[rand.Intn(len(choices))]
+		if success < 1 {
+			return c.JSON(fiber.Map{
+				"status_code": http.StatusBadRequest,
+			})
+		}
+
+		payload := map[string]any{}
+		err := c.BodyParser(&payload)
+		if err != nil {
+			fmt.Println(err)
+			return c.JSON(fiber.Map{
+				"status_code": http.StatusBadRequest,
+			})
+		}
+		return c.JSON(fiber.Map{
+			"status_code": http.StatusOK,
+		})
+	})
 	server.Listen(":3000")
 }
